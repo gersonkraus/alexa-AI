@@ -223,10 +223,17 @@ async def call_provider(provider, settings, api_key, system_prompt, messages, to
         logger.warning("llm request failed: %s", exc)
         raise HTTPException(502, "LLM request failed") from exc
     try:
-        return provider.parse(response.json())
+        parsed_body = response.json()
+        turn = provider.parse(parsed_body)
     except ValueError as exc:
         logger.warning("invalid llm response body: %s", exc)
         raise HTTPException(502, "invalid LLM response body") from exc
+    if not turn.text and not turn.tool_calls:
+        # Diagnóstico temporário: texto vazio sem tool_calls é inesperado e o
+        # corpo cru ajuda a distinguir corte por token de outra causa (ex.:
+        # done_reason, canal de raciocínio separado do content).
+        logger.warning("empty parsed response body=%s", json.dumps(parsed_body, ensure_ascii=False)[:800])
+    return turn
 
 
 async def chat_via_policy(provider, settings, api_key, system_prompt, messages, query):

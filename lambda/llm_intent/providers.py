@@ -50,7 +50,15 @@ class OllamaProvider:
         return {"Authorization": f"Bearer {api_key}"}
 
     def build_body(self, model, system_prompt, messages, tools, max_tokens):
-        body = {"model": model, "messages": [{"role": "system", "content": system_prompt}] + messages, "stream": False}
+        body = {
+            "model": model, "messages": [{"role": "system", "content": system_prompt}] + messages, "stream": False,
+            # gpt-oss (e outros modelos de raciocínio no Ollama) gastam parte do
+            # orçamento de tokens "pensando" antes de escrever a resposta visível
+            # — para voz, isso já cortava respostas no meio da frase mesmo com
+            # max_tokens generoso. Desligado porque não usamos o raciocínio.
+            "think": False,
+            "options": {"num_predict": max_tokens},
+        }
         if tools:
             body["tools"] = [{"type": "function", "function": {
                 "name": WEB_SEARCH_TOOL_NAME, "description": WEB_SEARCH_DESCRIPTION, "parameters": _web_search_parameters(),

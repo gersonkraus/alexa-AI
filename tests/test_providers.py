@@ -18,6 +18,10 @@ def test_ollama_build_body_without_tools():
     assert body["model"] == "gpt-oss:20b"
     assert body["messages"][0] == {"role": "system", "content": "seja breve"}
     assert "tools" not in body
+    # Regressão: sem isso, gpt-oss gastava parte do orçamento "pensando" e
+    # cortava a resposta de voz no meio da frase.
+    assert body["think"] is False
+    assert body["options"]["num_predict"] == 300
 
 
 def test_ollama_build_body_with_tools_exposes_web_search():

@@ -58,7 +58,9 @@ O campo `llm_model` pode ser trocado por outro modelo disponível na sua conta O
 
 ## Deploy opcional na Railway
 
-Use este modo se você quer memória entre sessões ou pretende adicionar ferramentas domésticas depois. Na Railway, crie um serviço a partir da pasta `railway/` (Dockerfile detectado automaticamente), adicione um Volume montado em `/data`, e configure as variáveis de [`railway/.env.example`](railway/.env.example). Gere um domínio público e teste `GET /health`.
+Use este modo se você quer memória entre sessões ou pretende adicionar ferramentas domésticas depois. Na Railway, crie um serviço a partir da pasta `railway/`, adicione um Volume montado em `/data`, e configure as variáveis de [`railway/.env.example`](railway/.env.example). Gere um domínio público e teste `GET /health`.
+
+Este repositório é um monorepo (Lambda + gateway juntos), então ao conectar a um repositório Git configure explicitamente: **Root Directory** = `railway` e **Builder** = Dockerfile (`dockerfilePath` = `Dockerfile`). Sem isso, o builder automático da Railway (Railpack) não reconhece o projeto — ele espera achar um projeto Python "puro" na raiz do repo, não numa subpasta, e falha o build.
 
 Depois, em `lambda/config.json`, configure:
 

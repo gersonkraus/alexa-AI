@@ -53,6 +53,10 @@ def upstream_error_message(exception):
         return "O limite de uso do Ollama foi atingido. Tente novamente daqui a pouco."
     if "timed out" in detail or "timeout" in detail:
         return "O Ollama demorou mais que o permitido para responder. Tente novamente."
+    if "http 503" in detail:
+        return "O gateway não tem uma chave de API configurada. Entre no painel da Railway e configure uma."
+    if "http 502" in detail:
+        return "O serviço de IA está indisponível no momento. Tente novamente em alguns segundos."
     return CANNED.get("error")
 
 

@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import secrets
 import sqlite3
@@ -16,6 +17,9 @@ from pydantic import BaseModel, Field
 
 from policy import needs_web_search
 from providers import get_provider
+
+logger = logging.getLogger("gateway")
+logger.setLevel(logging.INFO)
 
 app = FastAPI(title="Alexa Ollama V2 gateway", version="2.2.0")
 DB_PATH = os.getenv("DB_PATH", "/data/alexa_memory.sqlite3")
@@ -196,7 +200,8 @@ async def run_web_search(settings, query):
                                           json={"query": query, "max_results": 4})
         response.raise_for_status()
         return response.json().get("results", []) or []
-    except (httpx.HTTPError, ValueError):
+    except (httpx.HTTPError, ValueError) as exc:
+        logger.warning("web search failed query=%s error=%s", query, exc)
         return []
 
 
@@ -207,12 +212,20 @@ async def call_provider(provider, settings, api_key, system_prompt, messages, to
             response = await client.post(settings["llm_url"], headers=provider.headers(api_key), json=body)
         response.raise_for_status()
     except httpx.TimeoutException as exc:
+        logger.warning("llm request timed out: url=%s timeout=%s", settings["llm_url"], settings["timeout_seconds"])
         raise HTTPException(504, "LLM request timed out") from exc
+    except httpx.HTTPStatusError as exc:
+        # Sem isso, o log só mostrava "502 Bad Gateway" na linha de acesso do
+        # uvicorn — nenhuma pista do que o provedor respondeu de verdade.
+        logger.warning("llm request failed: status=%s body=%s", exc.response.status_code, exc.response.text[:500])
+        raise HTTPException(502, "LLM request failed") from exc
     except httpx.HTTPError as exc:
+        logger.warning("llm request failed: %s", exc)
         raise HTTPException(502, "LLM request failed") from exc
     try:
         return provider.parse(response.json())
     except ValueError as exc:
+        logger.warning("invalid llm response body: %s", exc)
         raise HTTPException(502, "invalid LLM response body") from exc
 
 

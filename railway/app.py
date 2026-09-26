@@ -244,7 +244,9 @@ async def chat_via_policy(provider, settings, api_key, system_prompt, messages, 
             # Falha segura: não deixa o modelo responder com conhecimento velho
             # quando a pergunta claramente depende de dado atual.
             raise HTTPException(503, "search_unavailable")
-        instructions = search_instructions(reference_time_now(), TIMEZONE, context)
+        reference_time = reference_time_now()
+        logger.warning("search context query=%s reference_time=%s context=%s", query, reference_time, context[:600])
+        instructions = search_instructions(reference_time, TIMEZONE, context)
         messages = messages[:-1] + [{"role": "user", "content": f"{instructions}\n\nPergunta: {query}"}]
     turn = await call_provider(provider, settings, api_key, system_prompt, messages, tools=False)
     if not turn.text:

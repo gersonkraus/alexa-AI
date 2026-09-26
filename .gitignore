@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+lambda/config.json
+railway/.env
+*.sqlite3
+.venv/
+venv/

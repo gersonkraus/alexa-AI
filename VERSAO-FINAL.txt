@@ -1,0 +1,26 @@
+Alexa Ollama V2 Final
+Versão: 2.5.0
+Data: 26/09/2026
+
+Incluído:
+- Alexa Custom Skill em pt-BR
+- contexto multi-turn
+- Web Search corrigido
+- política de atualidade e fallback seguro
+- data e hora locais no fuso America/Sao_Paulo
+- compatibilidade com runtimes Alexa Python 3.8 sem zoneinfo
+- respostas otimizadas para voz
+- modelo de interação pt-BR validado, sem diálogo de elicitação em conflito com AMAZON.SearchQuery
+- gateway Railway opcional, agora aplicando de fato as regras obrigatórias de voz no modelo
+- painel web para modelo, API key, system prompt e desempenho
+- API key criptografada no armazenamento persistente
+- resposta progressiva durante buscas, para reduzir o silêncio percebido
+- intents de "repetir" e "não" com reconhecimento próprio
+- card visual com a resposta em dispositivos com tela
+- timeouts recalibrados para caber na janela de resposta da Alexa
+- suporte a múltiplos provedores de LLM (Ollama, Grok/xAI, Anthropic), com chave e URL de busca separadas da chave de chat
+- tool calling opcional: o próprio modelo decide quando buscar, em vez da política de regex
+- paridade do gateway Railway com a Lambda: mesmos provedores e tool calling, agora configuráveis pelo painel web
+- correção de compatibilidade com Python 3.8 (socket.timeout não capturado, causava erro genérico em timeouts reais)
+
+Leia README.md antes do deploy.

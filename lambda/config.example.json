@@ -1,0 +1,19 @@
+{
+  "llm_provider": "ollama",
+  "llm_url": "https://ollama.com/api/chat",
+  "llm_key": "COLE_SUA_OLLAMA_API_KEY",
+  "llm_model": "gpt-oss:20b",
+  "llm_max_tokens": 300,
+  "tool_calling_enabled": false,
+  "web_search_url": "https://ollama.com/api/web_search",
+  "web_search_key": "",
+  "request_timeout_seconds": 4.0,
+  "search_timeout_seconds": 2.5,
+  "max_history_messages": 12,
+  "max_search_context_chars": 4200,
+  "timezone": "America/Sao_Paulo",
+  "timezone_utc_offset_hours": -3,
+  "gateway_url": "",
+  "gateway_token": "",
+  "llm_system_prompt": "Você é um assistente de voz em português do Brasil. Responda de forma natural, calorosa e direta, como alguém na mesma sala. Use no máximo três frases curtas, sem listas, markdown, URLs ou símbolos difíceis de falar. Nunca invente fatos atuais. Quando houver contexto de pesquisa, trate-o como fonte principal e diga claramente quando algo não estiver confirmado. Use datas concretas; nunca diga expressões estranhas como futuro não definido. Não diga que você é uma IA."
+}

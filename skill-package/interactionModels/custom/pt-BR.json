@@ -1,0 +1,34 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "assistente ia",
+      "modelConfiguration": {"fallbackIntentSensitivity": {"level": "LOW"}},
+      "intents": [
+        {"name": "AMAZON.CancelIntent", "samples": []},
+        {"name": "AMAZON.HelpIntent", "samples": []},
+        {"name": "AMAZON.StopIntent", "samples": []},
+        {"name": "AMAZON.YesIntent", "samples": []},
+        {"name": "AMAZON.NoIntent", "samples": []},
+        {"name": "AMAZON.RepeatIntent", "samples": []},
+        {"name": "AMAZON.FallbackIntent", "samples": []},
+        {"name": "DateIntent", "samples": [
+          "que dia é hoje", "qual dia é hoje", "qual é o dia de hoje", "qual é a data de hoje",
+          "que data é hoje", "me diga a data de hoje", "me diga que dia é hoje", "data de hoje"
+        ]},
+        {"name": "TimeIntent", "samples": [
+          "que horas são", "qual é a hora", "qual é o horário", "me diga as horas",
+          "me diga que horas são", "que horas são agora", "qual é a hora agora"
+        ]},
+        {"name": "QuestionIntent", "slots": [{"name": "question", "type": "AMAZON.SearchQuery"}], "samples": [
+          "me fale sobre {question}", "me diga {question}", "o que é {question}",
+          "quem é {question}", "quem foi {question}", "qual é {question}", "quando {question}",
+          "onde {question}", "por que {question}", "como {question}", "explique {question}",
+          "pesquise {question}", "pesquise na internet {question}", "procure {question}",
+          "qual é a notícia sobre {question}", "o que aconteceu com {question}",
+          "me conte mais sobre {question}", "e sobre {question}", "também {question}"
+        ]}
+      ],
+      "types": []
+    }
+  }
+}

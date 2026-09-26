@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Alexa Ollama · Configurações</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b0d12;--panel:#141821;--panel2:#1a202b;--line:#293142;--text:#edf2f7;--muted:#96a0b2;--accent:#7c9cff;--ok:#52d6a0;--bad:#ff7a90;--shadow:0 24px 70px #0008}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 10% 0,#1d2850 0,transparent 32%),radial-gradient(circle at 95% 5%,#203b37 0,transparent 25%),var(--bg);font:15px/1.5 Inter,ui-sans-serif,system-ui;color:var(--text);min-height:100vh}.wrap{width:min(980px,calc(100% - 32px));margin:48px auto}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:26px}.brand{display:flex;gap:14px;align-items:center}.logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,#8ea8ff,#6d66ff);display:grid;place-items:center;box-shadow:0 10px 35px #667bff55;font-size:22px}.brand h1{font-size:20px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}.status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}.dot{width:8px;height:8px;border-radius:99px;background:var(--ok);box-shadow:0 0 14px var(--ok)}.card{background:linear-gradient(145deg,#171c26eF,#11151deF);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}.login{max-width:480px;margin:100px auto 0;padding:30px}.login h2{margin:0 0 8px;font-size:22px}.login p{color:var(--muted);margin:0 0 22px}.content{display:none}.section{padding:26px 28px;border-bottom:1px solid var(--line)}.section:last-child{border:0}.section-head{display:flex;justify-content:space-between;gap:18px;margin-bottom:22px}.section h2{font-size:16px;margin:0}.section-head p{color:var(--muted);margin:3px 0 0;font-size:13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.full{grid-column:1/-1}label{display:block;color:#cbd3df;font-size:13px;margin-bottom:7px}input,textarea,select{width:100%;border:1px solid var(--line);background:#0d1118;color:var(--text);border-radius:11px;padding:11px 13px;outline:none;font:inherit;transition:.18s}input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #7c9cff1f}textarea{min-height:142px;resize:vertical}.hint{font-size:12px;color:var(--muted);margin:6px 0 0}.range-row{display:flex;gap:12px;align-items:center}.range-row input[type=range]{padding:0}.value{width:48px;text-align:right;color:var(--accent);font-variant-numeric:tabular-nums}.check-row{display:flex;align-items:center;gap:10px}.check-row input[type=checkbox]{width:18px;height:18px;flex:none}.check-row label{margin:0;color:var(--text)}.actions{padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px;background:#10141c}.btn{border:0;border-radius:11px;padding:11px 18px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#849fff,#7468f8);color:white;box-shadow:0 8px 22px #6f72ff3f}.btn:disabled{opacity:.55;cursor:wait}.link{border:0;background:none;color:var(--muted);cursor:pointer}.message{font-size:13px;color:var(--muted)}.message.ok{color:var(--ok)}.message.bad{color:var(--bad)}.key-state{color:var(--ok);font-size:12px;margin-left:7px}@media(max-width:680px){.wrap{margin:24px auto}.grid{grid-template-columns:1fr}.full{grid-column:auto}.section,.actions{padding:22px}.status{display:none}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="top">
+      <div class="brand"><div class="logo">◉</div><div><h1>Alexa Ollama</h1><p>Central de configuração do assistente</p></div></div>
+      <div class="status"><span class="dot"></span> Serviço online</div>
+    </div>
+
+    <section id="login" class="card login">
+      <h2>Acesso administrativo</h2>
+      <p>Use o token definido em <strong>ADMIN_TOKEN</strong> na Railway.</p>
+      <label for="token">Token de administração</label>
+      <input id="token" type="password" autocomplete="current-password" placeholder="Cole o token aqui">
+      <button class="btn" style="margin-top:16px;width:100%" onclick="connectPanel()">Entrar</button>
+      <div id="login-message" class="message" style="margin-top:12px"></div>
+    </section>
+
+    <section id="content" class="card content">
+      <div class="section">
+        <div class="section-head"><div><h2>Modelo e conexão</h2><p>Provedor de LLM usado nas próximas respostas da Alexa.</p></div></div>
+        <div class="grid">
+          <div><label for="provider">Provedor</label><select id="provider"><option value="ollama">Ollama Cloud</option><option value="openai">Compatível com OpenAI (Grok/xAI, OpenRouter…)</option><option value="anthropic">Anthropic (Claude)</option></select></div>
+          <div><label for="model">Nome do modelo</label><input id="model" placeholder="gpt-oss:20b"></div>
+          <div class="full"><label for="url">URL da API de chat</label><input id="url" type="url" placeholder="https://ollama.com/api/chat"></div>
+          <div class="full"><label for="api-key">Chave da API <span id="key-state" class="key-state"></span></label><input id="api-key" type="password" autocomplete="new-password" placeholder="Deixe vazio para manter a chave atual"><p id="key-hint" class="hint">A chave salva nunca é exibida pelo painel.</p></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><div><h2>Busca web</h2><p>Continua sempre na API do Ollama, com sua própria credencial — mesmo trocando de provedor de chat acima.</p></div></div>
+        <div class="grid">
+          <div class="full"><label for="search-url">URL da busca</label><input id="search-url" type="url" placeholder="https://ollama.com/api/web_search"><p class="hint">Deixe vazio para desligar a busca por completo.</p></div>
+          <div class="full"><label for="search-key">Chave da busca <span id="search-key-state" class="key-state"></span></label><input id="search-key" type="password" autocomplete="new-password" placeholder="Deixe vazio para manter a chave atual"><p id="search-key-hint" class="hint">Se o provedor de chat for Ollama, pode ficar vazia (usa a mesma chave acima).</p></div>
+          <div class="full check-row"><input type="checkbox" id="tool-calling"><label for="tool-calling">Deixar o modelo decidir quando buscar (tool calling)</label></div>
+          <p class="hint full">Desligado: a mesma política de regex em português da Lambda decide. Ligado: o modelo recebe uma ferramenta de busca e decide sozinho — mais flexível, porém com até duas chamadas ao modelo por pergunta (mais latência).</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><div><h2>Personalidade</h2><p>Define idioma, estilo, limites e comportamento das respostas.</p></div></div>
+        <label for="prompt">System prompt</label>
+        <textarea id="prompt"></textarea>
+        <p class="hint">Para o Echo, mantenha a instrução de responder em até três frases, sem markdown ou URLs — a Lambda já reforça isso automaticamente, mas ajuda o modelo seguir desde o início.</p>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><div><h2>Desempenho e contexto</h2><p>Ajustes pensados para equilibrar naturalidade e baixa latência.</p></div></div>
+        <div class="grid">
+          <div><label for="temperature">Criatividade</label><div class="range-row"><input id="temperature" type="range" min="0" max="2" step="0.1"><span id="temperature-value" class="value"></span></div><p class="hint">0,2 é confiável; valores maiores ficam mais criativos.</p></div>
+          <div><label for="max-tokens">Limite da resposta</label><input id="max-tokens" type="number" min="40" max="1000"><p class="hint">120 tokens costuma funcionar bem para voz.</p></div>
+          <div><label for="timeout">Timeout em segundos</label><input id="timeout" type="number" min="2" max="30" step="0.5"><p class="hint">Mantenha abaixo do request_timeout_seconds da Lambda.</p></div>
+          <div><label for="max-messages">Mensagens na memória</label><input id="max-messages" type="number" min="2" max="50"><p class="hint">Mais contexto aumenta custo e tempo de resposta.</p></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="link" onclick="logout()">Sair do painel</button>
+        <div style="display:flex;align-items:center;gap:16px"><span id="save-message" class="message"></span><button id="save" class="btn" onclick="saveSettings()">Salvar alterações</button></div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const $=id=>document.getElementById(id);
+    const temp=$('temperature'); temp.addEventListener('input',()=>{$('temperature-value').textContent=Number(temp.value).toFixed(1).replace('.',',')});
+    function headers(){return {'Content-Type':'application/json','X-Admin-Token':sessionStorage.getItem('adminToken')||''}}
+    async function connectPanel(){sessionStorage.setItem('adminToken',$('token').value);$('login-message').textContent='Conectando…';try{const r=await fetch('/admin/settings',{headers:headers()});if(!r.ok)throw new Error('Token inválido.');const s=await r.json();fill(s);$('login').style.display='none';$('content').style.display='block'}catch(e){$('login-message').textContent=e.message;$('login-message').className='message bad';sessionStorage.removeItem('adminToken')}}
+    function fill(s){
+      $('provider').value=s.llm_provider;$('model').value=s.llm_model;$('url').value=s.llm_url;
+      $('search-url').value=s.web_search_url||'';$('tool-calling').checked=!!s.tool_calling_enabled;
+      $('prompt').value=s.system_prompt;temp.value=s.temperature;$('temperature-value').textContent=Number(s.temperature).toFixed(1).replace('.',',');
+      $('max-tokens').value=s.max_tokens;$('timeout').value=s.timeout_seconds;$('max-messages').value=s.max_messages;
+      $('key-state').textContent=s.api_key_configured?'● configurada':'○ não configurada';$('api-key').disabled=!s.api_key_editable;
+      $('search-key-state').textContent=s.web_search_key_configured?'● configurada':'○ não configurada';$('search-key').disabled=!s.web_search_key_editable;
+      if(!s.api_key_editable)$('key-hint').textContent='Para alterar a chave aqui, configure SETTINGS_ENCRYPTION_KEY na Railway.';
+      if(!s.web_search_key_editable)$('search-key-hint').textContent='Para alterar a chave aqui, configure SETTINGS_ENCRYPTION_KEY na Railway.';
+    }
+    async function saveSettings(){
+      const b=$('save'),m=$('save-message');b.disabled=true;m.textContent='Salvando…';m.className='message';
+      const data={
+        llm_provider:$('provider').value,llm_url:$('url').value,llm_model:$('model').value,api_key:$('api-key').value||null,
+        web_search_url:$('search-url').value,web_search_key:$('search-key').value||null,tool_calling_enabled:$('tool-calling').checked,
+        system_prompt:$('prompt').value,temperature:Number(temp.value),max_tokens:Number($('max-tokens').value),
+        timeout_seconds:Number($('timeout').value),max_messages:Number($('max-messages').value),
+      };
+      try{const r=await fetch('/admin/settings',{method:'PUT',headers:headers(),body:JSON.stringify(data)});const out=await r.json();if(!r.ok)throw new Error(out.detail||'Não foi possível salvar.');m.textContent='Salvo';m.className='message ok';$('api-key').value='';$('search-key').value='';$('key-state').textContent='● configurada'}catch(e){m.textContent=e.message;m.className='message bad'}finally{b.disabled=false}
+    }
+    function logout(){sessionStorage.removeItem('adminToken');location.reload()}
+    if(sessionStorage.getItem('adminToken'))connectPanel();
+  </script>
+</body>
+</html>

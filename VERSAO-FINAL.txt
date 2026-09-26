@@ -1,5 +1,5 @@
 Alexa Ollama V2 Final
-Versão: 2.5.0
+Versão: 2.6.0
 Data: 26/09/2026
 
 Incluído:
@@ -22,5 +22,7 @@ Incluído:
 - tool calling opcional: o próprio modelo decide quando buscar, em vez da política de regex
 - paridade do gateway Railway com a Lambda: mesmos provedores e tool calling, agora configuráveis pelo painel web
 - correção de compatibilidade com Python 3.8 (socket.timeout não capturado, causava erro genérico em timeouts reais)
+- correção de resposta vazia/cortada do gpt-oss: "think": false não desligava o raciocínio de fato; trocado por "think": "low"
+- mensagens de fallback/ajuda corrigidas para ensinar frases-gatilho que realmente existem no modelo de interação
 
 Leia README.md antes do deploy.

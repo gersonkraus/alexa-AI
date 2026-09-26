@@ -58,7 +58,14 @@ class CannedResponse:
     DATA = {
         "launch": ["Pode falar.", "Estou ouvindo.", "Pronto. Qual é a sua pergunta?"],
         "reprompt": ["Quer saber mais alguma coisa?", "Pode continuar.", "O que mais você gostaria de saber?"],
-        "help": ["Você pode me perguntar sobre notícias, pessoas, tecnologia ou qualquer outro assunto."],
+        "help": [
+            "Você pode me perguntar sobre notícias, pessoas, tecnologia ou qualquer outro assunto. "
+            "Por exemplo: me fale sobre a Segunda Guerra Mundial, ou o que é buraco negro."
+        ],
+        "fallback": [
+            "Não entendi. Tente começar com 'me fale sobre', 'o que é' ou 'quem foi', seguido do assunto.",
+            "Não captei. Pode tentar de novo começando com 'me fale sobre' ou 'quem foi'?",
+        ],
         "goodbye": ["Até mais!", "Tudo bem. Até a próxima!"],
         "error": ["Não consegui consultar o serviço agora. Tente novamente em alguns segundos."],
         "search_error": ["Não consegui verificar informações atualizadas agora. Tente novamente daqui a pouco."],

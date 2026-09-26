@@ -268,7 +268,11 @@ class FallbackHandler(AbstractRequestHandler):
         return ask_utils.is_intent_name("AMAZON.FallbackIntent")(handler_input)
 
     def handle(self, handler_input):
-        return respond(handler_input, "Não entendi. Tente dizer: pergunte ao assistente, seguido da sua pergunta.")
+        # Perguntas de acompanhamento sem frase-gatilho (ex.: "que dia ele nasceu"
+        # após já estar no meio de uma conversa) caem aqui — a Alexa não entrega o
+        # texto bruto no FallbackIntent, então não dá para reencaminhar a pergunta
+        # para o modelo. O melhor possível é ensinar uma frase que de fato funciona.
+        return respond(handler_input, CANNED.get("fallback"))
 
 
 class SessionEndedHandler(AbstractRequestHandler):

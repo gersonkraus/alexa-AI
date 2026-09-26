@@ -18,6 +18,8 @@ Implementação pronta para Alexa Custom Skill + Ollama Cloud. O modo padrão é
 - No modo gateway, as regras obrigatórias de voz (sem markdown, poucas frases) agora chegam de fato até o Ollama — antes eram calculadas na Lambda mas descartadas pela Railway.
 - Suporte a outros provedores de LLM além do Ollama (Grok/xAI, Anthropic/Claude), com chave e URL de busca web separadas da chave de chat.
 - Tool calling opcional: em vez da política de regex decidir quando buscar, o próprio modelo decide (desligado por padrão).
+- Corrigido corte/resposta vazia do `gpt-oss` (Ollama): `"think": false` não desliga o raciocínio de fato — o campo `thinking` segue sem limite e consome todo o orçamento de tokens, deixando `content` vazio. Trocado para `"think": "low"`, que limita o raciocínio e garante espaço para a resposta (também mais rápido: ~1.3s contra 2-3s+ antes).
+- Mensagens de "não entendi" (fallback e ajuda) agora ensinam frases que de fato existem no modelo de interação (`me fale sobre`, `o que é`, `quem foi`...) em vez de uma frase-gatilho inexistente.
 
 ## Trocando de provedor de LLM (Ollama, Grok/xAI, Anthropic)
 

@@ -18,9 +18,10 @@ def test_ollama_build_body_without_tools():
     assert body["model"] == "gpt-oss:20b"
     assert body["messages"][0] == {"role": "system", "content": "seja breve"}
     assert "tools" not in body
-    # Regressão: sem isso, gpt-oss gastava parte do orçamento "pensando" e
-    # cortava a resposta de voz no meio da frase.
-    assert body["think"] is False
+    # Regressão: "think": False não desliga o raciocínio do gpt-oss de fato — o
+    # campo "thinking" segue sem limite e consome o num_predict inteiro, deixando
+    # "content" vazio. "low" limita o raciocínio e garante espaço pra resposta.
+    assert body["think"] == "low"
     assert body["options"]["num_predict"] == 300
 
 

@@ -53,10 +53,13 @@ class OllamaProvider:
         body = {
             "model": model, "messages": [{"role": "system", "content": system_prompt}] + messages, "stream": False,
             # gpt-oss (e outros modelos de raciocínio no Ollama) gastam parte do
-            # orçamento de tokens "pensando" antes de escrever a resposta visível
-            # — para voz, isso já cortava respostas no meio da frase mesmo com
-            # max_tokens generoso. Desligado porque não usamos o raciocínio.
-            "think": False,
+            # orçamento de tokens "pensando" antes de escrever a resposta visível.
+            # "think": False NÃO desliga isso de fato — o campo "thinking" continua
+            # vindo cheio e sem limite, consumindo o num_predict inteiro e deixando
+            # "content" vazio (confirmado em produção). "low" limita o raciocínio a
+            # poucas linhas, garantindo espaço para a resposta e respondendo bem
+            # mais rápido (~1.3s vs. 2-3s+ com "false").
+            "think": "low",
             "options": {"num_predict": max_tokens},
         }
         if tools:

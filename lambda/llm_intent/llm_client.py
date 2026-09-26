@@ -70,7 +70,7 @@ class LLMClient:
             raise UpstreamError("empty model response")
         return turn.text
 
-    def chat_with_tools(self, system_prompt, messages, reference_time, timezone):
+    def chat_with_tools(self, system_prompt, messages, now, timezone):
         """Deixa o próprio modelo decidir se precisa buscar, em exatamente duas
         chamadas no máximo: uma oferecendo a ferramenta de busca, e — só se ela
         for usada — uma segunda sem tools que força uma resposta final em texto.
@@ -91,7 +91,7 @@ class LLMClient:
         query = (call.arguments or {}).get("query") or ""
         results = self.web_search(query) if query else []
         context = format_search_results(results, self.max_search_chars)
-        result_text = search_instructions(reference_time, timezone, context)
+        result_text = search_instructions(now, timezone, context)
         conversation.extend(self.provider.tool_result_messages(turn, call, result_text))
         final_turn = self._call_provider(system_prompt, conversation, tools=False)
         if not final_turn.text:

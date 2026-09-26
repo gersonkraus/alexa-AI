@@ -111,8 +111,7 @@ def _answer_via_tool_calling(handler_input, query):
     # instruído a admitir isso em vez de responder com conhecimento desatualizado.
     messages = list(history(handler_input))
     messages.append({"role": "user", "content": query})
-    reference_time = local_now().strftime("%d/%m/%Y %H:%M")
-    response, used_search = CLIENT.chat_with_tools(SYSTEM_PROMPT, messages, reference_time, TIMEZONE)
+    response, used_search = CLIENT.chat_with_tools(SYSTEM_PROMPT, messages, local_now(), TIMEZONE)
     remember(handler_input, "user", query)
     remember(handler_input, "assistant", response)
     return response, None, used_search
@@ -127,8 +126,7 @@ def _answer_via_policy(handler_input, query, force_search):
             # Do not let stale model knowledge answer a request explicitly/currently requiring search.
             logger.warning("required search unavailable query=%s", query)
             return None, "search_unavailable", should_search
-        reference_time = local_now().strftime("%d/%m/%Y %H:%M")
-        prompt = f"{search_instructions(reference_time, TIMEZONE, context)}\n\nPergunta: {query}"
+        prompt = f"{search_instructions(local_now(), TIMEZONE, context)}\n\nPergunta: {query}"
     messages = list(history(handler_input))
     messages.append({"role": "user", "content": prompt})
     response = CLIENT.chat(SYSTEM_PROMPT, messages)

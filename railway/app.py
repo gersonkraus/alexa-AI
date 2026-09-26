@@ -5,7 +5,7 @@ import secrets
 import sqlite3
 import time
 from contextlib import closing
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -175,10 +175,18 @@ def format_search_results(results, max_chars=4200):
     return "\n".join(chunks)[:max_chars]
 
 
-def search_instructions(reference_time, timezone, context):
+def search_instructions(now, timezone, context):
+    """`now` é o datetime de referência: "amanhã"/"hoje" são calculados aqui em
+    Python e entregues prontos ao modelo. Pedir pro gpt-oss calcular a data por
+    conta própria (mesmo com "think": "low") produzia datas erradas de forma
+    consistente em teste real — ex.: "amanhã" virava um dia antes de "hoje".
+    """
     if not context:
         return "A busca não retornou nenhum resultado confiável. Diga claramente que não há confirmação atual, sem inventar."
-    return (f"Data e hora de referência: {reference_time}, fuso {timezone}. "
+    today = now.strftime("%d/%m/%Y")
+    tomorrow = (now + timedelta(days=1)).strftime("%d/%m/%Y")
+    return (f"Data e hora de referência: {now.strftime('%d/%m/%Y %H:%M')}, fuso {timezone}. Hoje é {today}. "
+            f"Se a pergunta mencionar \"amanhã\", a data é {tomorrow} — use esse valor exato, não calcule por conta própria. "
             "Use somente fatos confirmados pelas fontes abaixo. Não transforme evento futuro em acontecimento passado. "
             "Para notícias, escolha no máximo três itens distintos e confirme que cada um corresponde à data pedida. "
             "Não cite URLs nem diga que recebeu fontes. Se as fontes não confirmarem a resposta, diga isso claramente.\n\n"
@@ -186,7 +194,7 @@ def search_instructions(reference_time, timezone, context):
 
 
 def reference_time_now():
-    return datetime.now(ZoneInfo(TIMEZONE)).strftime("%d/%m/%Y %H:%M")
+    return datetime.now(ZoneInfo(TIMEZONE))
 
 
 async def run_web_search(settings, query):
@@ -244,9 +252,7 @@ async def chat_via_policy(provider, settings, api_key, system_prompt, messages, 
             # Falha segura: não deixa o modelo responder com conhecimento velho
             # quando a pergunta claramente depende de dado atual.
             raise HTTPException(503, "search_unavailable")
-        reference_time = reference_time_now()
-        logger.warning("search context query=%s reference_time=%s context=%s", query, reference_time, context[:600])
-        instructions = search_instructions(reference_time, TIMEZONE, context)
+        instructions = search_instructions(reference_time_now(), TIMEZONE, context)
         messages = messages[:-1] + [{"role": "user", "content": f"{instructions}\n\nPergunta: {query}"}]
     turn = await call_provider(provider, settings, api_key, system_prompt, messages, tools=False)
     if not turn.text:

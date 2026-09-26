@@ -4,6 +4,7 @@ import json
 import os
 import random
 import re
+from datetime import timedelta
 
 
 def load_config():
@@ -43,11 +44,21 @@ def format_search_results(results, max_chars=4200):
     return "\n".join(chunks)[:max_chars]
 
 
-def search_instructions(reference_time, timezone, context):
-    """Texto que acompanha o contexto de busca (ou a ausência dele) para o modelo."""
+def search_instructions(now, timezone, context):
+    """Texto que acompanha o contexto de busca (ou a ausência dele) para o modelo.
+
+    `now` é o datetime de referência (não uma string pronta): "amanhã" e "hoje"
+    são calculados aqui em Python e entregues prontos ao modelo, porque pedir
+    para o gpt-oss calcular a data por conta própria (mesmo com poucas linhas
+    de raciocínio) produzia datas erradas — ex.: dizia que "amanhã" era um dia
+    antes de "hoje" — de forma consistente em teste real.
+    """
     if not context:
         return "A busca não retornou nenhum resultado confiável. Diga claramente que não há confirmação atual, sem inventar."
-    return (f"Data e hora de referência: {reference_time}, fuso {timezone}. "
+    today = now.strftime("%d/%m/%Y")
+    tomorrow = (now + timedelta(days=1)).strftime("%d/%m/%Y")
+    return (f"Data e hora de referência: {now.strftime('%d/%m/%Y %H:%M')}, fuso {timezone}. Hoje é {today}. "
+            f"Se a pergunta mencionar \"amanhã\", a data é {tomorrow} — use esse valor exato, não calcule por conta própria. "
             "Use somente fatos confirmados pelas fontes abaixo. Não transforme evento futuro em acontecimento passado. "
             "Para notícias, escolha no máximo três itens distintos e confirme que cada um corresponde à data pedida. "
             "Não cite URLs nem diga que recebeu fontes. Se as fontes não confirmarem a resposta, diga isso claramente.\n\n"

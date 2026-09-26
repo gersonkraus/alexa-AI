@@ -1,8 +1,11 @@
 import socket
 import sys
 import urllib.request
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
+
+REFERENCE_TIME = datetime(2026, 9, 26, 10, 0)
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "lambda"))
 from llm_intent.llm_client import LLMClient, UpstreamError
@@ -20,7 +23,7 @@ def make_client(provider="ollama", tool_calling_enabled=True):
 def test_chat_with_tools_returns_text_without_search_when_model_does_not_call_tool():
     client = make_client()
     with patch.object(client, "_post", return_value={"message": {"role": "assistant", "content": "Dois mais dois são quatro."}}) as mock_post:
-        text, used_search = client.chat_with_tools("system", [{"role": "user", "content": "quanto é 2+2"}], "26/09/2026 10:00", "America/Sao_Paulo")
+        text, used_search = client.chat_with_tools("system", [{"role": "user", "content": "quanto é 2+2"}], REFERENCE_TIME, "America/Sao_Paulo")
     assert text == "Dois mais dois são quatro."
     assert used_search is False
     assert mock_post.call_count == 1
@@ -37,7 +40,7 @@ def test_chat_with_tools_calls_search_then_forces_final_text():
     responses = iter([tool_call_response, search_response, final_response])
     with patch.object(client, "_post", side_effect=lambda *a, **k: next(responses)) as mock_post:
         text, used_search = client.chat_with_tools(
-            "system", [{"role": "user", "content": "quem é o presidente"}], "26/09/2026 10:00", "America/Sao_Paulo"
+            "system", [{"role": "user", "content": "quem é o presidente"}], REFERENCE_TIME, "America/Sao_Paulo"
         )
     assert text == "O presidente atual é fulano."
     assert used_search is True
@@ -54,7 +57,7 @@ def test_chat_with_tools_handles_empty_search_without_crashing():
     responses = iter([tool_call_response, empty_search_response, final_response])
     with patch.object(client, "_post", side_effect=lambda *a, **k: next(responses)):
         text, used_search = client.chat_with_tools(
-            "system", [{"role": "user", "content": "pergunta obscura"}], "26/09/2026 10:00", "America/Sao_Paulo"
+            "system", [{"role": "user", "content": "pergunta obscura"}], REFERENCE_TIME, "America/Sao_Paulo"
         )
     assert "não encontrei" in text.lower() or "não" in text.lower()
     assert used_search is True

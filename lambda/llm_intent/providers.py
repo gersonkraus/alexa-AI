@@ -91,6 +91,12 @@ class OpenAICompatibleProvider:
 
     def build_body(self, model, system_prompt, messages, tools, max_tokens):
         body = {"model": model, "messages": [{"role": "system", "content": system_prompt}] + messages, "stream": False}
+        if "gpt-oss" in model.lower():
+            # Mesmo problema do Ollama: gpt-oss (ex.: servido pela Groq) gasta
+            # parte do max_tokens "pensando" antes do content visível, cortando
+            # a resposta de voz no meio. "reasoning_effort" é o equivalente do
+            # "think" do Ollama nas APIs compatíveis com Chat Completions.
+            body["reasoning_effort"] = "low"
         if tools:
             body["tools"] = [{"type": "function", "function": {
                 "name": WEB_SEARCH_TOOL_NAME, "description": WEB_SEARCH_DESCRIPTION, "parameters": _web_search_parameters(),

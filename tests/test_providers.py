@@ -66,6 +66,21 @@ def test_openai_compatible_parses_plain_text():
     assert turn.text == "42"
 
 
+def test_openai_compatible_limits_reasoning_for_gpt_oss():
+    provider = get_provider("openai")
+    # Regressão: a Groq também serve gpt-oss via Chat Completions, e sem isso
+    # o modelo gastava parte do max_tokens "pensando" e cortava a resposta no
+    # meio (confirmado em produção: 1 em 4 respostas truncada).
+    body = provider.build_body("openai/gpt-oss-20b", "seja breve", [], tools=False, max_tokens=200)
+    assert body["reasoning_effort"] == "low"
+
+
+def test_openai_compatible_skips_reasoning_effort_for_non_reasoning_models():
+    provider = get_provider("openai")
+    body = provider.build_body("grok-4.6", "seja breve", [], tools=False, max_tokens=200)
+    assert "reasoning_effort" not in body
+
+
 def test_anthropic_build_body_uses_top_level_system_and_max_tokens():
     provider = get_provider("anthropic")
     body = provider.build_body("claude-haiku-4-5", "seja breve", [{"role": "user", "content": "oi"}], tools=False, max_tokens=250)

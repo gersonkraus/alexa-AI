@@ -7,8 +7,6 @@ falhas aqui nunca podem interromper o fluxo principal — são só melhor esfor�
 
 import json
 import logging
-import socket
-import urllib.error
 import urllib.request
 
 logger = logging.getLogger(__name__)
@@ -37,5 +35,10 @@ def send_progressive_response(handler_input, speech_text):
         )
         with urllib.request.urlopen(request, timeout=DIRECTIVE_TIMEOUT_SECONDS):
             pass
-    except (urllib.error.URLError, urllib.error.HTTPError, AttributeError, TimeoutError, socket.timeout) as exc:
-        logger.warning("progressive response failed: %s", exc)
+    except Exception as exc:  # noqa: BLE001 — melhor esforço: nunca pode derrubar a resposta principal.
+        # Confirmado em produção: um tipo de exceção fora da lista específica
+        # (URLError/HTTPError/AttributeError/TimeoutError/socket.timeout) escapou
+        # daqui, sem ser capturado pelo try/except do QuestionHandler (esta
+        # chamada roda antes dele), e derrubou toda a resposta no handler de erro
+        # genérico — mesmo com o gateway respondendo certo e rápido.
+        logger.warning("progressive response failed: %s: %s", type(exc).__name__, exc)

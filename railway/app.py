@@ -43,7 +43,10 @@ DEFAULTS = {
 
 
 class ChatRequest(BaseModel):
-    conversation_id: str = Field(min_length=8, max_length=160)
+    # amzn1.ask.account.* (o userId que a Lambda usa como conversation_id) passa
+    # tranquilamente de 250 caracteres — 160 rejeitava toda requisição real com
+    # 422, algo que só um teste com um userId de verdade revela.
+    conversation_id: str = Field(min_length=8, max_length=400)
     # Pergunta crua do usuário. A decisão de buscar (e a busca em si) é toda
     # daqui pra frente — a Lambda não faz mais nenhum pré-processamento quando
     # o gateway está configurado.
@@ -266,7 +269,10 @@ def health():
 @app.get("/admin/settings")
 def get_settings(x_admin_token: str | None = Header(default=None)):
     require_admin(x_admin_token)
-    settings = runtime_settings()
+    # Nunca devolver os blobs criptografados: não são a chave em texto puro,
+    # mas não têm por que sair da API — se SETTINGS_ENCRYPTION_KEY vazar um dia,
+    # essas respostas já capturadas (proxy, logs) não podem virar chaves.
+    settings = {k: v for k, v in runtime_settings().items() if not k.endswith("_encrypted")}
     return {
         **settings,
         "api_key_configured": bool(encrypted_api_key()),

@@ -69,6 +69,9 @@ def test_admin_settings_roundtrip_and_key_encryption():
         assert body["api_key_configured"] is True
         assert body["web_search_key_configured"] is True
         assert "api_key" not in body and "web_search_key" not in body  # nunca devolve em texto plano
+        # Regressão: o blob cifrado não pode sair da API, mesmo cifrado.
+        assert "api_key_encrypted" not in body
+        assert "web_search_key_encrypted" not in body
 
         assert gateway_app.encrypted_api_key() == "grok-secret"
         assert gateway_app.encrypted_web_search_key() == "ollama-secret"
@@ -87,6 +90,17 @@ def test_chat_requires_gateway_token():
 def test_chat_without_api_key_returns_503():
     resp = client.post("/v1/chat", json={"conversation_id": "abc12345", "message": "oi"}, headers=GATEWAY_HEADERS)
     assert resp.status_code == 503
+
+
+def test_chat_accepts_real_length_alexa_user_id_as_conversation_id():
+    # Regressão: amzn1.ask.account.* passa de 250 caracteres. max_length=160
+    # rejeitava com 422 toda requisição real vinda da Lambda (só um userId de
+    # verdade, não um mock curto de teste, revelava isso).
+    real_length_user_id = "amzn1.ask.account." + "A" * 235
+    assert len(real_length_user_id) > 160
+    with patch.object(gateway_app, "ENCRYPTION_KEY", ""), patch.dict(os.environ, {}, clear=False):
+        resp = client.post("/v1/chat", json={"conversation_id": real_length_user_id, "message": "oi"}, headers=GATEWAY_HEADERS)
+    assert resp.status_code != 422, resp.text
 
 
 def _mock_response(json_body, status_code=200):

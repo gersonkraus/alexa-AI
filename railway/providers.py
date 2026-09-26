@@ -52,7 +52,7 @@ class OllamaProvider:
             # orçamento de tokens "pensando" antes de escrever a resposta visível
             # — para voz, isso cortava respostas no meio da frase mesmo com
             # max_tokens generoso. Desligado porque não usamos o raciocínio.
-            "think": False,
+            "think": "low",
             "options": {"temperature": temperature, "num_predict": max_tokens},
         }
         if tools:
